@@ -11,10 +11,10 @@ class HomeController implements IControllerBase {
     };
 
     public initRoutes() {
-        this.router.get('/', this.index);
+        this.router.get('/', this.homeRoute);
     };
 
-    index = async (req: Request, res: Response) => {
+    homeRoute = async (req: Request, res: Response) => {
         res.render("home.ejs", {
             user: undefined,
             staffMembers: [],

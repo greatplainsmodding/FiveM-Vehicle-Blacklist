@@ -11,11 +11,14 @@ class HomeController implements IControllerBase {
     };
 
     public initRoutes() {
-        this.router.get('/', this.index);
+        this.router.get('/fetch', this.fetchVehicles);
     };
 
-    index = async (req: Request, res: Response) => {
-        res.send("api/")
+    fetchVehicles = async (req: Request, res: Response) => {
+        res.send([
+            { vehicle: "tug", owners: ["384187414584754176"] },
+            { vehicle: "bus", owners: ["384187414584754176-old"] }
+        ]);
     };
 };
 

@@ -11,11 +11,21 @@ class HomeController implements IControllerBase {
     };
 
     public initRoutes() {
-        this.router.get('/', this.index);
+        this.router.post('/add', this.add);
+        this.router.post('/remove', this.remove);
+        this.router.post('/update', this.update);
     };
 
-    index = async (req: Request, res: Response) => {
-        res.send("test")
+    add = async (req: Request, res: Response) => {
+        res.send("add")
+    };
+
+    remove = async (req: Request, res: Response) => {
+        res.send("remove")
+    };
+
+    update = async (req: Request, res: Response) => {
+        res.send("update")
     };
 };
 
