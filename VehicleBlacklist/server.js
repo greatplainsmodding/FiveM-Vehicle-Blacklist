@@ -1,9 +1,13 @@
 const fetch = require("node-fetch");
+const config = require("./config");
 
-const database = [
-    { vehicle: "tug", owners: ["384187414584754176"] },
-    { vehicle: "bus", owners: ["384187414584754176-old"] }
-]
+let database;
+async function updateDatabase() {
+    database = await fetch(config.url).then(res => res.json())
+    setTimeout(() => updateDatabase(), 10000)
+};
+
+updateDatabase()
 
 RegisterNetEvent("baseevents:enteringVehicle")
 AddEventHandler("baseevents:enteringVehicle", (targetVehicle, vehicleSeat, vehicleDisplayName) => {
@@ -11,8 +15,8 @@ AddEventHandler("baseevents:enteringVehicle", (targetVehicle, vehicleSeat, vehic
     const discord = getDiscord(src) || undefined
 
     for (let veh of database) {
-        if (veh.vehicle.toLowerCase() == vehicleDisplayName.toLowerCase()) {
-            if (!veh.owners.includes(discord)) {
+        if (veh.vehicle.toLowerCase() === vehicleDisplayName.toLowerCase() && vehicleSeat == 0) {
+            if (!veh.access.includes(discord) || !veh.owner === discord) {
                 TriggerClientEvent("DonatorScript:KickFromVehicle", src);
 
                 TriggerClientEvent('t-notify:client:Custom', src, {
@@ -27,13 +31,13 @@ AddEventHandler("baseevents:enteringVehicle", (targetVehicle, vehicleSeat, vehic
 });
 
 RegisterNetEvent("baseevents:enteredVehicle");
-AddEventHandler("baseevents:enteredVehicle", () => {
+AddEventHandler("baseevents:enteredVehicle", (currentVehicle, currentSeat, vehicleDisplayName) => {
     const src = source;
     const discord = getDiscord(src) || undefined
 
     for (let veh of database) {
-        if (veh.vehicle.toLowerCase() == vehicleDisplayName.toLowerCase()) {
-            if (!veh.owners.includes(discord)) {
+        if (veh.vehicle.toLowerCase() === vehicleDisplayName.toLowerCase() && vehicleSeat == 0) {
+            if (!veh.access.includes(discord) || !veh.owner === discord) {
                 TriggerClientEvent("DonatorScript:KickFromVehicle", src);
 
                 TriggerClientEvent('t-notify:client:Custom', src, {
@@ -54,8 +58,8 @@ AddEventHandler("entityCreating", (entity) => {
     const discord = getDiscord(owner) || undefined
 
     for (let veh of database) {
-        if (GetHashKey(veh.vehicle) == model) {
-            if (!veh.owners.includes(discord)) {
+        if (GetHashKey(veh.vehicle) === model) {
+            if (!veh.access.includes(discord) || !veh.owner === discord) {
                 CancelEvent();
 
                 TriggerClientEvent('t-notify:client:Custom', owner, {
@@ -68,6 +72,27 @@ AddEventHandler("entityCreating", (entity) => {
         };
     };
 });
+
+RegisterNetEvent("DonatorScript:checkVehicle")
+AddEventHandler("DonatorScript:checkVehicle", (model) => {
+    const owner = source
+    const discord = getDiscord(owner) || undefined
+
+    for (let veh of database) {
+        if (GetHashKey(veh.vehicle) === model) {
+            if (!veh.access.includes(discord) || !veh.owner === discord) {
+                TriggerClientEvent("DonatorScript:KickFromVehicle", owner);
+
+                TriggerClientEvent('t-notify:client:Custom', owner, {
+                    style: 'error',
+                    duration: 7000,
+                    message: "You aren't authorized to use this vehicle!",
+                    sound: true
+                });
+            };
+        };
+    };
+})
 
 function getDiscord(source) {
     for (let i = 0; i < GetNumPlayerIdentifiers(source); i++) {

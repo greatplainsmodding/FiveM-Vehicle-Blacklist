@@ -1,5 +1,3 @@
 module.exports = {
-    url: "mongodb://localhost:27017",
-    password: "",
-    database: "testDB"
+    url: "http://localhost:5000/api/fetch"
 }
