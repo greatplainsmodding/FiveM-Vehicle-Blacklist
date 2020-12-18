@@ -1,21 +1,19 @@
 import App from './app'
 
 import * as bodyParser from 'body-parser'
-import passport from 'passport';
-import cookieParser from 'cookie-parser';
-import Strategy from 'passport-discord';
-import session from 'express-session';
 
 // import loggerMiddleware from './middleware/logger'
 
 import HomeController from './controllers/home.controller'
-import ApiController from './controllers/vehicle.controller'
+import VehicleController from './controllers/vehicle.controller'
+import ApiController from './controllers/api.controller'
 
 const app = new App({
     port: 5000,
     controllers: [
-        new HomeController(),
-        new ApiController()
+        HomeController,
+        VehicleController,
+        ApiController
     ],
     middleWares: [
         bodyParser.json(),

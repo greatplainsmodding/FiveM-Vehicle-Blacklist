@@ -3,14 +3,14 @@ import mongoose, { Schema, Document } from 'mongoose';
 export interface IApplication extends Document {
     owner: String,
     vehicle: String,
-    access: String,
+    access: Array<Text>,
     date: String
 }
 
 const UserSchema: Schema = new Schema({
     owner: String,
     vehicle: String,
-    access: String,
+    access: Array,
     date: String
 });
 
@@ -29,7 +29,12 @@ class ApplicationHandler {
         return await model.findOneAndDelete(findBy)
     };
 
-    async new(data: Object) {
+    async new(data: {
+        owner: String,
+        vehicle: String,
+        access: Array<String>,
+        date: any
+    }) {
         const newModel = new model(data);
         newModel.save();
     };

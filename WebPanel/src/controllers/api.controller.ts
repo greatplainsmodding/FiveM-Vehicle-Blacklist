@@ -1,24 +1,25 @@
 import express from 'express'
 import { Request, Response } from 'express'
 import IControllerBase from '../interfaces/IControllerBase.interface'
+import vehicleModule from '../modules/vehicle';
+
+interface Req extends Request {
+    user: any
+}
 
 class HomeController implements IControllerBase {
-    public path = '/api/';
+    public path = '/api';
     public router = express.Router();
 
-    constructor() {
-        this.initRoutes();
+    constructor(staffPanel: any) {
+        this.initRoutes(staffPanel);
     };
 
-    public initRoutes() {
-        this.router.get('/fetch', this.fetchVehicles);
-    };
-
-    fetchVehicles = async (req: Request, res: Response) => {
-        res.send([
-            { vehicle: "tug", owners: ["384187414584754176"] },
-            { vehicle: "bus", owners: ["384187414584754176-old"] }
-        ]);
+    public initRoutes(staffPanel) {
+        this.router.get('/fetch', async (req: Req, res: Response) => {
+            const vehicles = await vehicleModule.getAll({});
+            res.send(vehicles)
+        });
     };
 };
 

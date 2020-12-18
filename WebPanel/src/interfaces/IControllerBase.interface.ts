@@ -1,5 +1,5 @@
 interface IControllerBase {
-    initRoutes(): any
+    initRoutes(staffPanel): any
 }
 
 export default IControllerBase
