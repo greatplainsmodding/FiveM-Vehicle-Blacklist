@@ -49,7 +49,7 @@ class HomeController implements IControllerBase {
             } else vehicle.access = [];
 
             await vehicle.save()
-            console.log(req.body)
+
             res.redirect("/");
             staffPanel.Logger(`${req.user.username} (${req.user.id}) just modified ${req.body.vehicle}.`);
         });
