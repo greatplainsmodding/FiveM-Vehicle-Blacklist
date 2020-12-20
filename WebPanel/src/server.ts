@@ -1,8 +1,5 @@
 import App from './app'
-
 import * as bodyParser from 'body-parser'
-
-// import loggerMiddleware from './middleware/logger'
 
 import HomeController from './controllers/home.controller'
 import VehicleController from './controllers/vehicle.controller'

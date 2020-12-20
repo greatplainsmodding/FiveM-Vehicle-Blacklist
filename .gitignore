@@ -1,6 +1,10 @@
 WebPanel/node_modules
-VehicleBlacklist/node_modules
 WebPanel/data/
 WebPanel/src/config.json
 node_modules/
 WebPanel/dist/
+WebPanel/dist/package-lock
+VehicleBlacklist/yarn.lock
+VehicleBlacklist/package-lock
+VehicleBlacklist/node_modules
+VehicleBlacklist/config.js
