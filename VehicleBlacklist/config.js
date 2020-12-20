@@ -1,3 +1,5 @@
 module.exports = {
-    url: "http://localhost:5000/api/fetch"
+    url: "https://donator.blaineccrp.com/api/fetch",
+    guildID: "",
+    discordToken: ""
 }

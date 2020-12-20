@@ -3,7 +3,7 @@ import mongoose, { Schema, Document } from 'mongoose';
 export interface IApplication extends Document {
     owner: String,
     vehicle: String,
-    access: Array<Text>,
+    access: Array<String>,
     date: String
 }
 

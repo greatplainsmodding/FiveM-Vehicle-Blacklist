@@ -9,7 +9,7 @@ import VehicleController from './controllers/vehicle.controller'
 import ApiController from './controllers/api.controller'
 
 const app = new App({
-    port: 5000,
+    port: 5566,
     controllers: [
         HomeController,
         VehicleController,

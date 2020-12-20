@@ -15,7 +15,6 @@
 </head>
 
 <body>
-
         <div class="modal" tabindex="-1" id="addVehicle" style="height: auto;">
             <div class="modal-dialog">
                 <div class="modal-content">
@@ -32,6 +31,7 @@
                                 <div class="row">
                                     <div class="col-md-12">
                                         <select name="owner" id="" class="form-control">
+                                            <option value="0" selected>None</option>
                                             <% for (let user of donators) { %>
                                                 <option value="<%= user.id %>"><%= user.nick || user.username %></option>
                                             <% } %>
@@ -44,7 +44,10 @@
                                     <div class="col-md-12">
                                         <select name="access" id="" class="form-control" multiple style="height: 150px;">
                                             <% for (let user of donators) { %>
-                                                <option value="<%= user.id %>"><%= user.nick || user.username %></option>
+                                                <option value="<%= user.id %>">(User) <%= user.nick || user.username %></option>
+                                            <% } %>
+                                            <% for (let role of roles) { %>
+                                                <option value="<%= role.id %>">(Role) <%= role.name %></option>
                                             <% } %>
                                         </select>
                                     </div>
@@ -75,16 +78,18 @@
                                 <label for="">Owner</label>
                                 <div class="row">
                                     <div class="col-md-12">
-                                        <select name="owner" class="form-control" <% if (permLevel == 0) { %> disabled <% } %>>
+                                        <select name="owner" class="form-control" <% if (permLevel == 0 && permLevel !== 1) { %> disabled <% } %>>
                                             <%
-                                                for (let user of donators) {
-                                                    if (user.id === vehicle.ownerID) { %>
-                                                        <option value="<%= vehicle.ownerID %>" selected><%= user.nick || user.username %></option>
-                                                    <% } else { %>
-                                                        <option value="<%= user.id %>"><%= user.nick || user.username %></option>
-                                                    <% }
-                                                }
-                                            %>
+                                            let hasOwner = false
+                                            for (let user of donators) {
+                                                if (user.id === vehicle.ownerID) { hasOwner = true %>
+                                                    <option value="<%= vehicle.ownerID %>" selected><%= user.nick || user.username %></option>
+                                                <% } else { %>
+                                                    <option value="<%= user.id %>"><%= user.nick || user.username %></option>
+                                                <% }
+                                            } %>
+
+                                            <option value="0" <% if (hasOwner == false) { %> selected <% } %>>None</option>
                                         </select>
                                     </div>
                                 </div><br>
@@ -96,18 +101,30 @@
                                             <%
                                                 for (let user of donators) {
                                                     if (vehicle.access.map(user => user.id).includes(user.id)) { %>
-                                                        <option value="<%= vehicle.ownerID %>" selected><%= user.nick || user.username %></option>
+                                                        <option value="<%= user.id %>" selected <% if (vehicle.ownerID !== req.user.id && permLevel !== 1) { %> disabled <% } %>>(User) <%= user.nick || user.username %></option>
                                                     <% } else { %>
-                                                        <option value="<%= user.id %>"><%= user.nick || user.username %></option>
+                                                        <option value="<%= user.id %>" <% if (vehicle.ownerID !== req.user.id && permLevel !== 1) { %> disabled <% } %>>(User) <%= user.nick || user.username %></option>
                                                     <% }
                                                 }
                                             %>
+
+                                            <% if (permLevel == 1) {
+                                                for (let role of roles) {
+                                                    if (vehicle.access.map(accInfo => accInfo.id).includes(role.id)) { %>
+                                                        <option value="<%= role.id %>" selected <% if (vehicle.ownerID !== req.user.id && permLevel !== 1) { %> disabled <% } %>>(Role) <%= role.name %></option>
+                                                    <% } else { %>
+                                                        <option value="<%= role.id %>" <% if (vehicle.ownerID !== req.user.id && permLevel !== 1) { %> disabled <% } %>>(Role) <%= role.name %></option>
+                                                    <% }
+                                                }
+                                            } %>
                                         </select>
                                     </div>
                                 </div>
                         </div>
                         <div class="modal-footer" style="width: 100%;">
+                            <% if (vehicle.ownerID == req.user.id || permLevel == 1) { %>
                             <button type="submit" name="vehicleID" value="<%= vehicle._id %>" class="btn btn-success">Edit Vehicle</button>
+                            <% } %>
                         </form>
                         <% if (permLevel == 1) { %>
                             <form action="/api/vehicle/delete" method="POST">
@@ -128,7 +145,7 @@
 
         <div class="content">
             <!-- <div class="table"> -->
-                <table class="table table-hover">
+                <table class="table table-hover" >
                     <thead class="thead-light">
                         <tr>
                             <th scope="col">#</th>
@@ -136,16 +153,22 @@
                             <th scope="col">Owner</th>
                             <th scope="col">Access Given</th>
                             <th scope="col">Date Added</th>
+                            <th scope="col">
+                                <form>
+                                    <input type="text" id="searchVehicleInput" class="form-control formSearch" onkeypress="return event.keyCode!=13" placeholder="Search Users">
+                                </form>
+                            </th>
                         </tr>
                     </thead>
                     <tbody>
-                        <% for (vehicle of vehicles) { %>
-                            <tr data-bs-toggle="modal" data-bs-target="#edit<%= vehicle._id %>">
-                                <th scope="row">1</th>
-                                <th scope=""><%= vehicle.vehicle %></th>
-                                <th><%= vehicle.owner %></th>
-                                <th><%= vehicle.access.map(user => user.name).join(", ") %></th>
-                                <th><%= vehicle.date %></th>
+                        <% for (i = 0; i < vehicles.length; i++) { %>
+                            <tr class="vehicle-clickable-item" data-bs-toggle="modal" data-bs-target="#edit<%= vehicles[i]._id %>" id="node-<%= vehicles[i].vehicle %>">
+                                <th scope="row"><%= i %></th>
+                                <th scope=""><%= vehicles[i].vehicle %></th>
+                                <th><%= vehicles[i].owner %></th>
+                                <th style="max-width: 350px;"><%= vehicles[i].access.map(user => user.name).join(", ") %></th>
+                                <th><%= vehicles[i].date %></th>
+                                <th></th>
                             </tr>                            
                         <% } %>
                     </tbody>
@@ -159,7 +182,36 @@
         </div>
     </div>
 
-    
+    <script>
+        let search = document.getElementById("searchVehicleInput");
+        console.log(search)
+        search.onkeyup = function () {
+            let input = search.value;
+            console.log(input)
+            if (input !== undefined && input !== null && input !== "") {
+                if (document.getElementById("node-" + input)) {
+                    let result = document.getElementById("node-" + input);
+                    result.style = "display: table-row;";
+                    let items = document.getElementsByClassName("vehicle-clickable-item");
+                    Array.from(items).forEach((item) => {
+                        if (item.id != result.id) {
+                            item.style = "display: none;";
+                        }
+                    });
+                } else {
+                    let items = document.getElementsByClassName("vehicle-clickable-item");
+                    Array.from(items).forEach((item) => {
+                        item.style = "display: table-row;";
+                    });
+                }
+            } else {
+                let items = document.getElementsByClassName("vehicle-clickable-item");
+                Array.from(items).forEach((item) => {
+                    item.style = "display: table-row;";
+                });
+            }
+        }
+    </script>
     
     <!-- Option 1: Bootstrap Bundle with Popper -->
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.0-beta1/dist/js/bootstrap.bundle.min.js"></script>

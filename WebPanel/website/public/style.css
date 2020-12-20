@@ -30,3 +30,13 @@ hr {
 .tableHeader {
 
 } */
+
+tr {
+    height: 5px !important;
+    margin: 0 !important;
+    padding: 0 !important;
+}
+
+thead tr th {
+    padding: 9px !important;
+}

@@ -7,6 +7,7 @@ interface Req extends Request {
     user: any
 }
 
+
 class HomeController implements IControllerBase {
     public path = '/api';
     public router = express.Router();
@@ -15,10 +16,21 @@ class HomeController implements IControllerBase {
         this.initRoutes(staffPanel);
     };
 
-    public initRoutes(staffPanel) {
+    public async initRoutes(staffPanel) {
         this.router.get('/fetch', async (req: Req, res: Response) => {
+            const outVehicles = [];
             const vehicles = await vehicleModule.getAll({});
-            res.send(vehicles)
+
+            for (let vehicle of vehicles) {
+                vehicle.access.push(vehicle.owner)
+
+                outVehicles.push({
+                    vehicle: vehicle.vehicle,
+                    access: vehicle.access
+                })
+            };
+
+            res.send(outVehicles)
         });
     };
 };

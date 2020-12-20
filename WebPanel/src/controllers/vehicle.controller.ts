@@ -17,9 +17,9 @@ class HomeController implements IControllerBase {
     };
 
     public initRoutes(staffPanel: any) {
-        this.router.post('/add', async (req: Req, res: Response) => {
+        this.router.post('/add', staffPanel.isAuthenticated, async (req: Req, res: Response) => {
             vehicleModule.new({
-                owner: "384187414584754176",
+                owner: req.body.owner,
                 vehicle: req.body.vehicle,
                 access: req.body.access,
                 date: moment()
@@ -29,19 +29,27 @@ class HomeController implements IControllerBase {
             staffPanel.Logger(`${req.user.username} (${req.user.id}) just added ${req.body.vehicle} to the blacklist.`)
         });
 
-        this.router.post('/delete', async (req: Req, res: Response) => {
+        this.router.post('/delete', staffPanel.isAuthenticated, async (req: Req, res: Response) => {
             const data = await vehicleModule.delete({ _id: req.body.vehicleID });
             staffPanel.Logger(`${req.user.username} (${req.user.id}) just deleted ${data.vehicle} from the blacklist.`);
             res.redirect("/");
         });
 
-        this.router.post('/edit', async (req: Req, res: Response) => {
-            vehicleModule.update({_id: req.body.vehicleID}, {
-                owner: req.body.owner,
-                vehicle: req.body.vehicle,
-                access: req.body.access || []
-            });
+        this.router.post('/edit', staffPanel.isAuthenticated, async (req: Req, res: Response) => {
+            const vehicle = await vehicleModule.get({ _id: req.body.vehicleID });
+            vehicle.owner = req.body.owner || vehicle.owner;
+            vehicle.vehicle = req.body.vehicle || vehicle.vehicle;
 
+            if (req.body.access) {
+                if (typeof req.body.access === "string") {
+                    vehicle.access = [req.body.access];
+                } else {
+                    vehicle.access = req.body.access;
+                };
+            } else vehicle.access = [];
+
+            await vehicle.save()
+            console.log(req.body)
             res.redirect("/");
             staffPanel.Logger(`${req.user.username} (${req.user.id}) just modified ${req.body.vehicle}.`);
         });

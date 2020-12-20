@@ -1,25 +1,50 @@
 const fetch = require("node-fetch");
 const config = require("./config");
 
+const users = {};
+const authorization = `Bot ${config.discordToken}`;
+
 let database;
 async function updateDatabase() {
     database = await fetch(config.url).then(res => res.json())
-    setTimeout(() => updateDatabase(), 10000)
+    setTimeout(() => updateDatabase(), 10000);
 };
 
-updateDatabase()
+updateDatabase();
 
-RegisterNetEvent("baseevents:enteringVehicle")
-AddEventHandler("baseevents:enteringVehicle", (targetVehicle, vehicleSeat, vehicleDisplayName) => {
-    const src = source;
-    const discord = getDiscord(src) || undefined
+AddEventHandler("playerConnecting", async (source) => {
+    const license = getLicense(source) || undefined;
+    const discord = getDiscord(source) || undefined;
+
+    if (discord) {
+        const roles = await getRoles(source);
+        users[license] = roles;
+        users[license].push(discord)
+    };
+});
+
+RegisterCommand("vehBlacklist", async (source) => {
+    const license = getLicense(source) || undefined;
+    const discord = getDiscord(source) || undefined;
+
+    if (discord) {
+        const roles = await getRoles(source);
+        users[license] = roles;
+        users[license].push(discord)
+    };
+});
+
+RegisterNetEvent("baseevents:enteredVehicle");
+AddEventHandler("baseevents:enteredVehicle", async (currentVehicle, currentSeat, vehicleDisplayName) => {
+    const owner = source;
+    database = await fetch(config.url).then(res => res.json());
 
     for (let veh of database) {
-        if (veh.vehicle.toLowerCase() === vehicleDisplayName.toLowerCase() && vehicleSeat == 0) {
-            if (!veh.access.includes(discord) || !veh.owner === discord) {
-                TriggerClientEvent("DonatorScript:KickFromVehicle", src);
+        if (veh.vehicle.toLowerCase() === vehicleDisplayName.toLowerCase() && currentSeat == -1) {
+            if (await hasPermission(owner, veh.access) == false) {
+                TriggerClientEvent("DonatorScript:KickFromVehicle", owner);
 
-                TriggerClientEvent('t-notify:client:Custom', src, {
+                TriggerClientEvent('t-notify:client:Custom', owner, {
                     style: 'error',
                     duration: 7000,
                     message: "You aren't authorized to use this vehicle!",
@@ -30,36 +55,14 @@ AddEventHandler("baseevents:enteringVehicle", (targetVehicle, vehicleSeat, vehic
     };
 });
 
-RegisterNetEvent("baseevents:enteredVehicle");
-AddEventHandler("baseevents:enteredVehicle", (currentVehicle, currentSeat, vehicleDisplayName) => {
-    const src = source;
-    const discord = getDiscord(src) || undefined
-
-    for (let veh of database) {
-        if (veh.vehicle.toLowerCase() === vehicleDisplayName.toLowerCase() && vehicleSeat == 0) {
-            if (!veh.access.includes(discord) || !veh.owner === discord) {
-                TriggerClientEvent("DonatorScript:KickFromVehicle", src);
-
-                TriggerClientEvent('t-notify:client:Custom', src, {
-                    style: 'error',
-                    duration: 7000,
-                    message: "You aren't authorized to use this vehicle!",
-                    sound: true
-                });
-            };
-        };
-    };
-})
-
 RegisterNetEvent("entityCreating");
-AddEventHandler("entityCreating", (entity) => {
+AddEventHandler("entityCreating", async (entity) => {
     const model = GetEntityModel(entity);
     const owner = NetworkGetEntityOwner(entity);
-    const discord = getDiscord(owner) || undefined
 
     for (let veh of database) {
         if (GetHashKey(veh.vehicle) === model) {
-            if (!veh.access.includes(discord) || !veh.owner === discord) {
+            if (await hasPermission(owner, veh.access) == false) {
                 CancelEvent();
 
                 TriggerClientEvent('t-notify:client:Custom', owner, {
@@ -74,13 +77,12 @@ AddEventHandler("entityCreating", (entity) => {
 });
 
 RegisterNetEvent("DonatorScript:checkVehicle")
-AddEventHandler("DonatorScript:checkVehicle", (model) => {
-    const owner = source
-    const discord = getDiscord(owner) || undefined
-
+AddEventHandler("DonatorScript:checkVehicle", async (model) => {
+    const owner = source;
+    
     for (let veh of database) {
         if (GetHashKey(veh.vehicle) === model) {
-            if (!veh.access.includes(discord) || !veh.owner === discord) {
+            if (await hasPermission(owner, veh.access) == false) {
                 TriggerClientEvent("DonatorScript:KickFromVehicle", owner);
 
                 TriggerClientEvent('t-notify:client:Custom', owner, {
@@ -92,11 +94,59 @@ AddEventHandler("DonatorScript:checkVehicle", (model) => {
             };
         };
     };
-})
+});
 
 function getDiscord(source) {
     for (let i = 0; i < GetNumPlayerIdentifiers(source); i++) {
         const identifier = GetPlayerIdentifier(source, i);
         if (identifier && identifier.startsWith("discord:")) return identifier.split(":")[1];
     };
+
+    return undefined;
+};
+
+function getLicense(source) {
+    for (let i = 0; i < GetNumPlayerIdentifiers(source); i++) {
+        const identifier = GetPlayerIdentifier(source, i);
+        if (identifier && identifier.startsWith("license:")) return identifier.split(":")[1];
+    };
+};
+
+async function hasPermission(source, allowsAccess) {
+    let hasAccess = false;
+    const license = getLicense(source);
+    const discord = getDiscord(source);
+
+    if (!users[license]) {
+        if (getDiscord(source)) {
+            const roles = await getRoles(source);
+            users[license] = roles;
+            users[license].push(discord)
+        } else users[license] = [];
+    };
+
+    for (let access of allowsAccess) {
+        for (let role of users[license]) {
+            if (access === role) {
+                hasAccess = true;
+            };
+        };
+    };
+
+    return hasAccess;
+};
+
+async function getRoles(source) {
+    const discord = getDiscord(source) || undefined;
+    
+    if (discord) {
+        const info = await fetch(`https://discordapp.com/api/guilds/${config.guildID}/members/${discord}`, {
+            headers: {
+                "Content-Type": "application/json",
+                "Authorization": authorization
+            }
+        }).then(res => res.json());
+
+        return info.roles;
+    } else return undefined;
 };
