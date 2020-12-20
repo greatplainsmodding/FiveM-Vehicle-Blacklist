@@ -1,10 +1,10 @@
 {
-    "token": "",
+    "token": "NzE3MjE3NjA4NTg3MjgwNDQ1.XtXG8w.hapKD4vOcFR8t4n2X-MoYavHZ5A",
     "discord": "702556315699904604",
     "donatorRole": "706722384173858817",
     "passport": {
         "secret": "somerandomstring",
-        "clientSecret": "",
+        "clientSecret": "HuIeIvzoTIICc7wS-3e6hOmyN-hL89PQ",
         "clientID": "717217608587280445",
         "callbackURL": "http://localhost:5566/dashboard/callback"
     }

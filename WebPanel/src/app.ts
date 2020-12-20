@@ -5,17 +5,6 @@ import passport from 'passport';
 import Strategy from 'passport-discord';
 import session from 'express-session';
 import Logger from './services/Logger';
-import fetch from 'node-fetch'
-
-
-
-fetch("https://staff.blaineccrp.com/api/v1/players/get/76561198980531588").then(res => res.json()).then(res => {
-    fetch("https://plugin.tebex.io/user/76561198980531588", {
-        headers: {
-            ["X-Tebex-Secret"]: "f279d5799213160f376e4e2a5ba7709dd196f1a3"
-        }
-    }).then(res => res.json()).then(res => console.log(res))
-})
 
 const Eris = require("eris")
 
