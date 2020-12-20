@@ -9,17 +9,8 @@
     font-family: Arial, Helvetica, sans-serif;
 }
 
-.title {
-    margin-top: 75px;
-}
-
 hr {
     background-color: #000;
-}
-
-.title h3 {
-    font-size: 23px;
-    font-weight: 550 !important;
 }
 
 .table a {
@@ -30,6 +21,15 @@ hr {
 .tableHeader {
 
 } */
+
+.title {
+    margin-top: 75px;
+}
+
+.title h3 {
+    /* font-size: 23px; */
+    font-weight: 375 !important;
+}
 
 tr {
     height: 5px !important;
