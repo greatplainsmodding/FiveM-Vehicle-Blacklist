@@ -1,11 +1,17 @@
 {
-    "token": "botToken",
+    "token": "",
     "discord": "702556315699904604",
-    "donatorRole": "706722384173858817",
+    "serverName": "Blaine County Country RP",
+    "port": 5000,
     "passport": {
         "secret": "somerandomstring",
-        "clientSecret": "botSecret",
-        "clientID": "717217608587280445",
-        "callbackURL": "https://donator.blaineccrp.com/dashboard/callback"
+        "clientSecret": "",
+        "clientID": "",
+        "callbackURL": "http://localhost:5000/dashboard/callback"
+    },
+    "permissions": {
+        "donator": "",
+        "manager": "",
+        "bypass": ""
     }
 }

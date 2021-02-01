@@ -1,12 +1,12 @@
-import express from 'express'
-import { Request, Response } from 'express'
-import IControllerBase from '../interfaces/IControllerBase.interface'
+import express from 'express';
+import { Request, Response } from 'express';
+import IControllerBase from '../interfaces/IControllerBase.interface';
 import vehicleModule from '../modules/vehicle';
 import moment from 'moment';
 
 interface Req extends Request {
-    user: any
-}
+    user: any;
+};
 
 class HomeController implements IControllerBase {
     public path = '/api/vehicle/';
@@ -26,7 +26,7 @@ class HomeController implements IControllerBase {
             });
     
             res.redirect("/");
-            staffPanel.Logger(`${req.user.username} (${req.user.id}) just added ${req.body.vehicle} to the blacklist.`)
+            staffPanel.Logger(`${req.user.username} (${req.user.id}) just added ${req.body.vehicle} to the blacklist.`);
         });
 
         this.router.post('/delete', staffPanel.isAuthenticated, async (req: Req, res: Response) => {
@@ -48,7 +48,7 @@ class HomeController implements IControllerBase {
                 };
             } else vehicle.access = [];
 
-            await vehicle.save()
+            await vehicle.save();
 
             res.redirect("/");
             staffPanel.Logger(`${req.user.username} (${req.user.id}) just modified ${req.body.vehicle}.`);

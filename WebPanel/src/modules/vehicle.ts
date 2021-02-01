@@ -5,7 +5,7 @@ export interface IApplication extends Document {
     vehicle: String,
     access: Array<String>,
     date: String
-}
+};
 
 const UserSchema: Schema = new Schema({
     owner: String,
@@ -23,7 +23,7 @@ class ApplicationHandler {
 
     async getAll(findBy: Object) {
         return await model.find(findBy)
-    }
+    };
 
     async delete(findBy: Object) {
         return await model.findOneAndDelete(findBy)
@@ -40,7 +40,7 @@ class ApplicationHandler {
     };
 
     async update(findBy: object, data: object) {
-        return await model.findOneAndUpdate(findBy, data)
+        return await model.findOneAndUpdate(findBy, data);
     };
 };
 
@@ -51,4 +51,4 @@ export default {
     delete: (new ApplicationHandler).delete,
     new: (new ApplicationHandler).new,
     update: (new ApplicationHandler).update
-}
+};

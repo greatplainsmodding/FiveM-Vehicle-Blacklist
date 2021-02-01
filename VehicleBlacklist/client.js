@@ -11,7 +11,7 @@ checkPlayer()
 function checkPlayer() {
     if (GetPedInVehicleSeat(GetVehiclePedIsIn(GetPlayerPed(-1), false), -1) === GetPlayerPed(-1)) {
         TriggerServerEvent("DonatorScript:checkVehicle", GetEntityModel(GetVehiclePedIsIn(GetPlayerPed(-1), false)))
-    }
+    };
 
-    setTimeout(() => checkPlayer(), 5000)
-}
+    setTimeout(() => checkPlayer(), 5000);
+};

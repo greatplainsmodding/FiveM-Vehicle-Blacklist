@@ -12,7 +12,8 @@ async function updateDatabase() {
 
 updateDatabase();
 
-AddEventHandler("playerConnecting", async (source) => {
+AddEventHandler("playerConnecting", async () => {
+    const source = global.source;
     const license = getLicense(source) || undefined;
     const discord = getDiscord(source) || undefined;
 
@@ -43,14 +44,7 @@ AddEventHandler("baseevents:enteredVehicle", async (currentVehicle, currentSeat,
         if (veh.vehicle.toLowerCase() === vehicleDisplayName.toLowerCase() && currentSeat == -1) {
             if (await hasPermission(owner, veh.access) == false) {
                 TriggerClientEvent("DonatorScript:KickFromVehicle", owner);
-
-                TriggerClientEvent('t-notify:client:Custom', owner, {
-                    style: 'error',
-                    duration: 7000,
-                    message: "You aren't authorized to use this vehicle!",
-                    sound: true
-                });
-            };
+            }
         };
     };
 });
@@ -64,14 +58,7 @@ AddEventHandler("entityCreating", async (entity) => {
         if (GetHashKey(veh.vehicle) === model) {
             if (await hasPermission(owner, veh.access) == false) {
                 CancelEvent();
-
-                TriggerClientEvent('t-notify:client:Custom', owner, {
-                    style: 'error',
-                    duration: 7000,
-                    message: "You aren't authorized to use this vehicle!",
-                    sound: true
-                });
-            };
+            }
         };
     };
 });
@@ -84,14 +71,7 @@ AddEventHandler("DonatorScript:checkVehicle", async (model) => {
         if (GetHashKey(veh.vehicle) === model) {
             if (await hasPermission(owner, veh.access) == false) {
                 TriggerClientEvent("DonatorScript:KickFromVehicle", owner);
-
-                TriggerClientEvent('t-notify:client:Custom', owner, {
-                    style: 'error',
-                    duration: 7000,
-                    message: "You aren't authorized to use this vehicle!",
-                    sound: true
-                });
-            };
+            }
         };
     };
 });

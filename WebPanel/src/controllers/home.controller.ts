@@ -1,12 +1,12 @@
-import express from 'express'
-import { Request, Response } from 'express'
-import IControllerBase from '../interfaces/IControllerBase.interface'
+import express from 'express';
+import { Request, Response } from 'express';
+import IControllerBase from '../interfaces/IControllerBase.interface';
 import vehicleModule from '../modules/vehicle';
 import passport from 'passport';
 
 interface Req extends Request {
-    user: any
-}
+    user: any;
+};
 
 class HomeController implements IControllerBase {
     public path = '/';
@@ -21,7 +21,7 @@ class HomeController implements IControllerBase {
             let vehicles;
             let permLevel = 0;
 
-            if ((staffPanel.bot.guilds.get(staffPanel.config.discord).members.get(req.user.id)).roles.includes("707268136126382114")) {
+            if ((staffPanel.bot.guilds.get(staffPanel.config.discord).members.get(req.user.id)).roles.includes(staffPanel.config.permissions.manager)) {
                 vehicles = await vehicleModule.getAll({});
                 permLevel = 1;
             } else {
@@ -43,17 +43,18 @@ class HomeController implements IControllerBase {
                             access.push({
                                 id: accessTo,
                                 name: accessToUser.nick || accessToUser.username + "#" + accessToUser.discriminator
-                            })
+                            });
                         } else {
                             const accessToRole = staffPanel.bot.guilds.get(staffPanel.config.discord).roles.get(accessTo);
                             if (accessToRole) {
                                 access.push({
                                     id: accessTo,
                                     name: accessToRole.name
-                                })
-                            }
-                        }
+                                });
+                            };
+                        };
                     };
+
                     if (user) {
                         const modifiedVehicle = {
                             _id: veh._id,
@@ -61,10 +62,11 @@ class HomeController implements IControllerBase {
                             ownerID: user.id,
                             access: access,
                             vehicle: veh.vehicle,
+                            speed: veh.speed,
                             date: veh.date
                         };
 
-                        outVehicles.push(modifiedVehicle)
+                        outVehicles.push(modifiedVehicle);
                     } else {
                         const modifiedVehicle = {
                             _id: veh._id,
@@ -72,17 +74,18 @@ class HomeController implements IControllerBase {
                             ownerID: "0",
                             access: access,
                             vehicle: veh.vehicle,
+                            speed: veh.speed,
                             date: veh.date
                         };
     
-                        outVehicles.push(modifiedVehicle)
-                    }
+                        outVehicles.push(modifiedVehicle);
+                    };
                 // };
             };
             
             let donators = [];
             staffPanel.bot.guilds.get(staffPanel.config.discord).members.forEach((user) => {
-                if (user.roles.includes("706722384173858817") || user.roles.includes("702596068986060950") && !user.roles.includes("706722384173858817")) donators.push(user)
+                if (user.roles.includes(staffPanel.config.permissions.donator) || user.roles.includes(staffPanel.config.permissions.manager)) donators.push(user);
             });
 
             let roles = [];
@@ -90,14 +93,16 @@ class HomeController implements IControllerBase {
                 roles.push({ name: role.name, id: role.id });
             });
 
-            res.render("home.ejs", {
+            res.render("vehicles.ejs", {
                 vehicles: outVehicles,
                 donators: donators,
                 roles: roles,
                 permLevel: permLevel,
                 req: {
                     user: req.user
-                }
+                },
+                serverName: staffPanel.config.serverName,
+                user: staffPanel.bot.guilds.get(staffPanel.config.discord).members.get(req.user.id)
             });
         });
 
@@ -107,11 +112,11 @@ class HomeController implements IControllerBase {
 
         this.router.get("/dashboard/callback", passport.authenticate("discord", { failureRedirect: "/login" }), async (req: Req, res, next) => {
             res.redirect("/");
-            staffPanel.Logger(`${req.user.username} (${req.user.id}) just logged into the panel.`)
+            staffPanel.Logger(`${req.user.username} (${req.user.id}) just logged into the panel.`);
         });
 
         this.router.get("/logout", staffPanel.isAuthenticated, (req: Req, res) => {
-            staffPanel.Logger(`${req.user.username} (${req.user.id}) just logged out of the panel.`)
+            staffPanel.Logger(`${req.user.username} (${req.user.id}) just logged out of the panel.`);
             req.logout();
             res.redirect("/login");
         });

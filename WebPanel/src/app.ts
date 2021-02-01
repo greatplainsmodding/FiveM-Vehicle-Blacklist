@@ -1,6 +1,6 @@
-import express, { Application, Request, Response } from 'express'
+import express, { Application, Request, Response } from 'express';
 import mongoose from 'mongoose';
-import config from './config.json'
+import config from './config.json';
 import passport from 'passport';
 import Strategy from 'passport-discord';
 import session from 'express-session';
@@ -9,21 +9,21 @@ import Logger from './services/Logger';
 const Eris = require("eris")
 
 interface App {
-    io: any
-    server: any
-    connections: any
-    config: typeof config
-}
+    io: any;
+    server: any;
+    connections: any;
+    config: typeof config;
+};
 
 class App {
-    public app: Application
+    public app: Application;
     public port: number;
     public bot: any;
     public Logger: Function;
     public isAuthenticated: Function;
 
     constructor(appInit: { port: number; middleWares: any; controllers: any; }) {
-        this.app = express()
+        this.app = express();
         this.port = appInit.port;
         this.bot = new Eris(config.token);
         this.config = config;
@@ -66,15 +66,14 @@ class App {
             next();
         };
 
-        this.middleware(appInit.middleWares)
-        this.routes(appInit.controllers)
-        this.assets()
-        this.template()
+        this.middleware(appInit.middleWares);
+        this.routes(appInit.controllers);
+        this.assets();
+        this.template();
 
         this.app.use(function (err, req, res, next) {
-            console.error(err.stack)
-            res.status(500).send('Something broke! Please contact a head developer!')
-        })
+            res.status(500).send('Something broke! Please contact a developer!');
+        });
 
         mongoose.connect("mongodb://localhost:27017/VehicleBlacklist", {
             useUnifiedTopology: true,

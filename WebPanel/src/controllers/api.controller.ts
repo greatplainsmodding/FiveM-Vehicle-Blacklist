@@ -1,11 +1,11 @@
-import express from 'express'
-import { Request, Response } from 'express'
-import IControllerBase from '../interfaces/IControllerBase.interface'
+import express from 'express';
+import { Request, Response } from 'express';
+import IControllerBase from '../interfaces/IControllerBase.interface';
 import vehicleModule from '../modules/vehicle';
 
 interface Req extends Request {
-    user: any
-}
+    user: any;
+};
 
 
 class HomeController implements IControllerBase {
@@ -22,15 +22,17 @@ class HomeController implements IControllerBase {
             const vehicles = await vehicleModule.getAll({});
 
             for (let vehicle of vehicles) {
-                vehicle.access.push(vehicle.owner)
-
+                vehicle.access.push(vehicle.owner);
+                vehicle.access.push(staffPanel.config.permissions.bypass);
+                
                 outVehicles.push({
                     vehicle: vehicle.vehicle,
-                    access: vehicle.access
-                })
+                    access: vehicle.access,
+                    speed: vehicle.speed
+                });
             };
 
-            res.send(outVehicles)
+            res.send(outVehicles);
         });
     };
 };

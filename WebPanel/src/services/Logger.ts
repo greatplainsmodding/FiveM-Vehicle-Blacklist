@@ -4,9 +4,9 @@ class Logger {
     static log(message:String) {
         const date = new Date;
         const m = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
-        const formattedTime = `${date.getHours()}:${date.getMinutes()}:${date.getSeconds()}`
-        const formattedDate = `${m[date.getMonth()]}-${date.getDate()}-${date.getFullYear()}`
-        const formattedDateLog = `${date.getDate()}-${m[date.getMonth()]}-${date.getFullYear()}`
+        const formattedTime = `${date.getHours()}:${date.getMinutes()}:${date.getSeconds()}`;
+        const formattedDate = `${m[date.getMonth()]}-${date.getDate()}-${date.getFullYear()}`;
+        const formattedDateLog = `${date.getDate()}-${m[date.getMonth()]}-${date.getFullYear()}`;
     
         const tm = [
             `\x1b[96m${formattedDate} | ${formattedTime}:\x1b[0m`,
